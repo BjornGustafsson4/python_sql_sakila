@@ -1,7 +1,8 @@
+import function
 import plotly.graph_objects as go
 
 
-def top20_graph(result_df):
+def top_graph(result_df, name):
     most_watched= go.Figure([go.Bar(
         x= result_df["title"],
         y= result_df["number_of_occurrences"],
@@ -29,22 +30,23 @@ def top20_graph(result_df):
             family= "Open Sans",
             size=10))
 
+    path= f"{function.cwd()}\\graphs\\{name}.html"
+    most_watched.write_html(path)
 
-    most_watched.show()
 
-
-def popular_graph(result_df):
+def popular_graph(pop_df, name):
     x_m= [
-        result_df["YM"],
-        result_df["title"]]
+        pop_df["YM"],
+        pop_df["title"]]
     
     
     popular_fig= go.Figure(go.Bar(
         x= x_m,
-        y= result_df["rented_per_month"]
+        y= pop_df["rented_per_month"]
     ))
 
 
     popular_fig.update_layout(barmode="relative")
 
-    popular_fig.show()
+    path= f"{function.cwd()}\\graphs\\{name}.html"
+    popular_fig.write_html(path)
