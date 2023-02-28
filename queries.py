@@ -1,10 +1,11 @@
 import pandas as pd
 import numpy as np
-import connect
+import function
 
 
+#runs SQL query to find top rented shows
 def top_rentals(login_d):
-    db_connect= connect.sql_connect(login_d)
+    db_connect= function.sql_connect(login_d)
     cursor= db_connect.cursor()
     cursor.execute("SELECT f.title, COUNT(i.film_id) AS number_of_occurrences FROM rental r "
         "JOIN inventory i ON r.inventory_id = i.inventory_id "
@@ -16,7 +17,7 @@ def top_rentals(login_d):
 
 
 def rental_date(login_d):
-    db_connect= connect.sql_connect(login_d)
+    db_connect= function.sql_connect(login_d)
     cursor= db_connect.cursor()
     cursor.execute("SELECT f.title, r.rental_date FROM rental r "
         "JOIN inventory i ON r.inventory_id = i.inventory_id "
@@ -27,8 +28,9 @@ def rental_date(login_d):
     return result_df
 
 
+#Runs SQL query and finds top 15 per month
 def popular(login_d):
-    db_connect= connect.sql_connect(login_d)
+    db_connect= function.sql_connect(login_d)
     cursor= db_connect.cursor()
     cursor.execute("SELECT i.film_id, f.title, COUNT(i.film_id) AS 'rentals_per_month', EXTRACT(YEAR_MONTH FROM r.rental_date) AS 'dates' "
         "FROM rental r " 
@@ -46,6 +48,8 @@ def popular(login_d):
         q= pd.DataFrame(pop_df.iloc[ym_index:(ym_index + 15)])
         result_df= pd.concat([result_df, q])
         result_df = result_df.reset_index(drop= True)
-        print(result_df)
+    for index in result_df.index:
+        result_df["YM"][index] = f"{str(result_df['YM'][index])[:4]}-{str(result_df['YM'][index])[-2:]}"
+
 
     return result_df
