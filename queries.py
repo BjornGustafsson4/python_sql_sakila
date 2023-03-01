@@ -32,24 +32,40 @@ def rental_date(login_d):
 def popular(login_d):
     db_connect= function.sql_connect(login_d)
     cursor= db_connect.cursor()
-    cursor.execute("SELECT i.film_id, f.title, COUNT(i.film_id) AS 'rentals_per_month', EXTRACT(YEAR_MONTH FROM r.rental_date) AS 'dates' "
-        "FROM rental r " 
+    cursor.execute("SELECT i.film_id, f.title, c.name AS 'genre', COUNT(i.film_id) AS 'rentals_per_month', EXTRACT(YEAR_MONTH FROM r.rental_date) AS 'dates' FROM rental r "
         "JOIN inventory i ON r.inventory_id = i.inventory_id "
         "JOIN film f ON i.film_id = f.film_id "
-        "GROUP BY i.film_id, dates "
+        "JOIN film_category fc ON i.film_id = fc.film_id "
+        "JOIN category c ON fc.category_id = c.category_id "
+        "GROUP BY i.film_id, dates, genre "
         "ORDER BY dates, rentals_per_month DESC;")
     result= cursor.fetchall()
-    pop_df = pd.DataFrame(result, columns=["id", "title", "rented_per_month", "YM"])
+    pop_df = pd.DataFrame(result, columns=["id", "title", "genre", "rented_per_month", "YM"])
     ym_unique = np.unique(pop_df["YM"], return_index= True)
     ym_dic = dict(map(list, zip(*ym_unique)))
     result_df = pd.DataFrame(columns=["id", "title", "rented_per_month", "YM"])
+    dicti = {}
     for ym in ym_dic:
         ym_index= ym_dic.get(ym)
         q= pd.DataFrame(pop_df.iloc[ym_index:(ym_index + 15)])
+        dicti[ym] = np.sum(q["rented_per_month"])
         result_df= pd.concat([result_df, q])
-        result_df = result_df.reset_index(drop= True)
+
+
+    #Adds color to bars by finding the most and least rented months
+    result_df["color"] = "gold"
+    v = list(dicti.values())
+    k = list(dicti.keys())
+    top_g= ym_dic.get(k[v.index(max(v))])
+    bottom_r= ym_dic.get(k[v.index(min(v))])
+    result_df["color"].loc[top_g:top_g + 15] = "darkgreen"
+    result_df["color"].loc[bottom_r:bottom_r + 15] = "crimson"
+
+
+    #Fixes YM from YYYYMM to YYYY-MM
     for index in result_df.index:
         result_df["YM"][index] = f"{str(result_df['YM'][index])[:4]}-{str(result_df['YM'][index])[-2:]}"
+    result_df = result_df.reset_index(drop= True)
 
 
     return result_df

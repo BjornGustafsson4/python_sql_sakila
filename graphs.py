@@ -1,12 +1,16 @@
 import function
 import plotly.graph_objects as go
+import numpy as np
 
 
 def top_graph(result_df, name):
     most_watched= go.Figure([go.Bar(
         x= result_df["title"],
         y= result_df["number_of_occurrences"],
-        marker_color="fuchsia"
+        marker= dict(
+        color= result_df["number_of_occurrences"],
+        colorscale="Viridis",
+        )
     )])
     
 
@@ -35,16 +39,15 @@ def top_graph(result_df, name):
 
 
 def popular_graph(pop_df, name):
-    x_m= [
-        pop_df["YM"],
-        pop_df["title"]]
-    
+    x_m= [pop_df["YM"], pop_df["title"]]
     
     popular_fig= go.Figure(go.Bar(
         x= x_m,
-        y= pop_df["rented_per_month"]
+        y= pop_df["rented_per_month"],
+        marker_color= pop_df["color"],
+        customdata= np.transpose([pop_df['title'], pop_df['genre']]),
+        hovertemplate= 'Amount: %{y} <br>%{x} <br>%{customdata[1]}'
     ))
-
 
     popular_fig.update_layout(barmode="relative")
 

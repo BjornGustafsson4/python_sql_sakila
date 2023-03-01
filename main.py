@@ -13,15 +13,13 @@ login_dic= function.login()
 
 
 graph_name= "top"
-if not function.graph_check(graph_name):
-    top_result= queries.top_rentals(login_dic)
-    graphs.top_graph(top_result, graph_name)
+top_result= queries.top_rentals(login_dic)
+graphs.top_graph(top_result, graph_name)
 
 
 graph_name= "popular"
-if not function.graph_check(graph_name):
-    popular_df= queries.popular(login_dic)
-    graphs.popular_graph(popular_df, graph_name)
+popular_df= queries.popular(login_dic)
+graphs.popular_graph(popular_df, graph_name)
 
 
 function.graph_open()
