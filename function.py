@@ -41,12 +41,6 @@ def folder_create():
         os.makedirs(path)
 
 
-def graph_check(graph_name):
-    path= f"{cwd()}\\graphs\\{graph_name}.html"
-    check= os.path.isfile(path)
-    return check
-
-
 def graph_open():
     path= f"{cwd()}\\graphs"
     for file in os.listdir(path):
