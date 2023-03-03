@@ -16,19 +16,21 @@ def top_rentals(login_d):
     return result_df
 
 
-def rental_date(login_d):
+#Finds actors from most rented to least
+def actors(login_d):
     db_connect= function.sql_connect(login_d)
     cursor= db_connect.cursor()
-    cursor.execute("SELECT f.title, r.rental_date FROM rental r "
-        "JOIN inventory i ON r.inventory_id = i.inventory_id "
-        "JOIN film f ON i.film_id = f.film_id "
-        "ORDER BY f.title, r.rental_date;")
+    cursor.execute("SELECT CONCAT(a.first_name, ' ', a.last_name, '_', a.actor_id ) AS full_name, COUNT(fa.actor_id) AS 'in_film' FROM film f "
+                    "JOIN film_actor fa ON f.film_id = fa.film_id "
+                    "JOIN actor a ON fa.actor_id = a.actor_id "
+                    "GROUP BY fa.actor_id "
+                    "ORDER BY in_film DESC;")
     result= cursor.fetchall()
-    result_df = pd.DataFrame(result, columns=["title", "rental_date"])
+    result_df = pd.DataFrame(result, columns=["full_name", "times_in_film"])
     return result_df
 
 
-#Runs SQL query and finds top 15 per month
+#Finds top 15 most popular rentals per month
 def popular(login_d):
     db_connect= function.sql_connect(login_d)
     cursor= db_connect.cursor()
@@ -66,6 +68,19 @@ def popular(login_d):
     for index in result_df.index:
         result_df["YM"][index] = f"{str(result_df['YM'][index])[:4]}-{str(result_df['YM'][index])[-2:]}"
     result_df = result_df.reset_index(drop= True)
+    return result_df
 
 
+#Finds revanue per month
+def revenue(login_d):
+    db_connect= function.sql_connect(login_d)
+    cursor= db_connect.cursor()
+    cursor.execute("SELECT SUM(p.amount) as 'amount', EXTRACT(YEAR_MONTH FROM r.rental_date) as 'year_and_month' FROM rental r "
+                    "JOIN payment p ON r.rental_id = p.rental_id "
+                    "GROUP BY year_and_month "
+                    "ORDER BY year_and_month;")
+    result= cursor.fetchall()
+    result_df = pd.DataFrame(result, columns=["income", "year_and_month"])
+    for index in result_df.index:
+        result_df["year_and_month"][index] = f"{str(result_df['year_and_month'][index])[:4]}-{str(result_df['year_and_month'][index])[-2:]}"
     return result_df

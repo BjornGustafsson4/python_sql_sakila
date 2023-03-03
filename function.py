@@ -6,6 +6,7 @@ def cwd():
     cwd= os.getcwd()
     return cwd
 
+
 #Checks and reads login.txt, if login.txt doesn't exist it creates one with your credentials you input
 def login():
     path= f"{cwd()}\\login.txt"
