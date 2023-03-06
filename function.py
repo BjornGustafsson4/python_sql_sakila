@@ -11,7 +11,7 @@ def cwd():
 def login():
     path= f"{cwd()}\\login.txt"
     if not os.path.isfile(path):
-        print("login.txt not found \n login.txt will be created")
+        print("login.txt not found \nlogin.txt will be created")
         username= input("please enter your MySQL username: ")
         password= input("please enter your MySQL password: ")
         lines= str.encode(f"username {username} \npassword {password}")

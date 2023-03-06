@@ -20,7 +20,7 @@ def top_rentals(login_d):
 def actors(login_d):
     db_connect= function.sql_connect(login_d)
     cursor= db_connect.cursor()
-    cursor.execute("SELECT CONCAT(a.first_name, ' ', a.last_name, '_', a.actor_id ) AS full_name, COUNT(fa.actor_id) AS 'in_film' FROM film f "
+    cursor.execute("SELECT CONCAT(a.first_name, ' ', a.last_name) AS full_name, COUNT(fa.actor_id) AS 'in_film' FROM film f "
                     "JOIN film_actor fa ON f.film_id = fa.film_id "
                     "JOIN actor a ON fa.actor_id = a.actor_id "
                     "GROUP BY fa.actor_id "
@@ -48,10 +48,14 @@ def popular(login_d):
     result_df = pd.DataFrame(columns=["id", "title", "rented_per_month", "YM"])
     dicti = {}
     for ym in ym_dic:
-        ym_index= ym_dic.get(ym)
-        q= pd.DataFrame(pop_df.iloc[ym_index:(ym_index + 15)])
-        dicti[ym] = np.sum(q["rented_per_month"])
-        result_df= pd.concat([result_df, q])
+        if ym == 200602:
+            continue
+        else:
+            ym_index= ym_dic.get(ym)
+            q= pd.DataFrame(pop_df.iloc[ym_index:(ym_index + 15)])
+            dicti[ym] = np.sum(q["rented_per_month"])
+            q.sort_values(by=["rented_per_month"])
+            result_df= pd.concat([result_df, q])
 
 
     #Adds color to bars by finding the most and least rented months
@@ -83,4 +87,6 @@ def revenue(login_d):
     result_df = pd.DataFrame(result, columns=["income", "year_and_month"])
     for index in result_df.index:
         result_df["year_and_month"][index] = f"{str(result_df['year_and_month'][index])[:4]}-{str(result_df['year_and_month'][index])[-2:]}"
+        if result_df["year_and_month"][index] == "2006-02":
+            result_df["year_and_month"][index] = f"{result_df['year_and_month'][index]} (incomplete)"
     return result_df
