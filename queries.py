@@ -45,7 +45,7 @@ def popular(login_d):
     pop_df = pd.DataFrame(result, columns=["id", "title", "genre", "rented_per_month", "YM"])
     ym_unique = np.unique(pop_df["YM"], return_index= True)
     ym_dic = dict(map(list, zip(*ym_unique)))
-    result_df = pd.DataFrame(columns=["id", "title", "rented_per_month", "YM"])
+    result_df = pd.DataFrame(columns=["id", "title", "rented_per_month", "YM", "color"])
     dicti = {}
     for ym in ym_dic:
         if ym == 200602:
@@ -58,19 +58,17 @@ def popular(login_d):
             result_df= pd.concat([result_df, q])
 
 
-    #Adds color to bars by finding the most and least rented months
-    result_df["color"] = "gold"
-    v = list(dicti.values())
-    k = list(dicti.keys())
-    top_g= ym_dic.get(k[v.index(max(v))])
-    bottom_r= ym_dic.get(k[v.index(min(v))])
-    result_df["color"].loc[top_g:top_g + 15] = "darkgreen"
-    result_df["color"].loc[bottom_r:bottom_r + 15] = "crimson"
-
-
-    #Fixes YM from YYYYMM to YYYY-MM
+    #Fixes YM from YYYYMM to YYYY-MM and color change
     for index in result_df.index:
         result_df["YM"][index] = f"{str(result_df['YM'][index])[:4]}-{str(result_df['YM'][index])[-2:]}"
+        if result_df["YM"][index] == "2005-05":
+            result_df["color"][index] = "rgb(102,194,165)"
+        if result_df["YM"][index] == "2005-06":
+            result_df["color"][index] = "rgb(252,141,98)"
+        if result_df["YM"][index] == "2005-07":
+            result_df["color"][index] = "rgb(141,160,203)"
+        if result_df["YM"][index] == "2005-08":
+            result_df["color"][index] = "rgb(231,138,195)"
     result_df = result_df.reset_index(drop= True)
     return result_df
 
