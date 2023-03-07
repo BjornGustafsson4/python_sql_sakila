@@ -17,6 +17,7 @@ def top_graph(result_df):
             colorscale="Viridis")),
         row= 1, col= 1)
     
+
     watched_fig.add_trace(go.Bar(
         x= result_df["title"].iloc[-15:],
         y= result_df["number_of_occurrences"].iloc[-15:],
@@ -25,12 +26,15 @@ def top_graph(result_df):
             colorscale="Viridis_r")),
         row= 2, col= 1)
 
+
     watched_fig.update_yaxes(title_text= "Times rented", 
                             row= 1, col= 1)
     watched_fig.update_yaxes(title_text= "Times rented", 
                             row= 2, col= 1)
     
+
     watched_fig.update_annotations(font_size=20)
+    watched_fig.update_layout(showlegend=False)
 
 
     path= f"{function.cwd()}\\graphs\\top.html"
@@ -68,7 +72,7 @@ def popular_graph(pop_df):
 
 def actor_graph(act_df):
     actor_fig= make_subplots(rows= 2, cols= 1,
-                             subplot_titles= ("Most rented actors", "Least rented actors"))
+                             subplot_titles= ("Actors in most amount of films", "Actors in least amount of films"))
 
 
     actor_fig.add_trace(go.Bar(
@@ -88,7 +92,10 @@ def actor_graph(act_df):
             colorscale="Viridis_r")),
             row= 2, col= 1)
     
+
+    actor_fig.update_annotations(font_size=20)
     actor_fig.update_layout(showlegend=False)
+
 
     path= f"{function.cwd()}\\graphs\\actor.html"
     actor_fig.write_html(path)
@@ -100,6 +107,7 @@ def revenue_graph(rev_df):
         values= rev_df['income'],
         texttemplate= "%{label} <br> %{value:$,s} <br>(%{percent})",
         hole= 0.6))
+
 
     revenue_fig.update_traces(
         hoverinfo= 'label+percent')
